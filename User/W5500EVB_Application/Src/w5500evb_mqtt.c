@@ -24,14 +24,14 @@ static void prvMQTTEchoTask(void* pvParameters)
 	unsigned char sendbuf[80], readbuf[80];
 	int rc = 0, count = 0;
 
-	uint8_t address[4] = { 198,41,30,194 };
+	uint8_t address[4] = { 118,89,70,79 };
 
 	MQTTPacket_connectData connectData = MQTTPacket_connectData_initializer;
 
 	NetworkInit(&network);
 	MQTTClientInit(&client, &network, 30000, sendbuf, sizeof(sendbuf), readbuf, sizeof(readbuf));
 
-	uint8_t address[4] = { 118,89,70,79 };
+
 	if ((rc = NetworkConnect(&network, (char*)address, 1883)) != 0)
 
 	while (!(getPHYStatus() & 0x01));
@@ -61,7 +61,10 @@ static void prvMQTTEchoTask(void* pvParameters)
 
 
 
-	while (MQTTConnect(&client, &connectData) != SUCCESS);
+	while (MQTTConnect(&client, &connectData) != SUCCESS)
+	{
+		//printf("321");
+	}
 
 	printf("MQTT Connected\n");
 
