@@ -24,6 +24,8 @@ static void prvMQTTEchoTask(void* pvParameters)
 	unsigned char sendbuf[80], readbuf[80];
 	int rc = 0, count = 0;
 
+	uint8_t address[4] = { 198,41,30,194 };
+
 	MQTTPacket_connectData connectData = MQTTPacket_connectData_initializer;
 
 	NetworkInit(&network);
@@ -31,7 +33,19 @@ static void prvMQTTEchoTask(void* pvParameters)
 
 	uint8_t address[4] = { 118,89,70,79 };
 	if ((rc = NetworkConnect(&network, (char*)address, 1883)) != 0)
+
+	while (!(getPHYStatus() & 0x01));
+
+	printf("PHY is ready\r\n");
+
+	while (!NetworkConnect(&network, (char*)address, 1883));
+
+	printf("TCP Connection is ready\r\n");
+
+	/*if ((rc = NetworkConnect(&network, (char*)address, 1883)) != 0)
 		printf("Return code from network connect is %d\n", rc);
+	else
+		printf("Return code from network connect is %d\n", rc);*/
 
 #if defined(MQTT_TASK)
 	if ((rc = MQTTStartTask(&client)) != pdPASS)
@@ -47,10 +61,14 @@ static void prvMQTTEchoTask(void* pvParameters)
 
 
 
-	if ((rc = MQTTConnect(&client, &connectData)) != 0)
+	while (MQTTConnect(&client, &connectData) != SUCCESS);
+
+	printf("MQTT Connected\n");
+
+	/*if ((rc = MQTTConnect(&client, &connectData)) != 0)
 		printf("Return code from MQTT connect is %d\n", rc);
 	else
-		printf("MQTT Connected\n");
+		printf("MQTT Connected\n");*/
 
 	if ((rc = MQTTSubscribe(&client, "/device/41A7E676A8DL98SZNS2AP7AB/r", QOS2, messageArrived)) != 0)
 		printf("Return code from MQTT subscribe is %d\n", rc);
