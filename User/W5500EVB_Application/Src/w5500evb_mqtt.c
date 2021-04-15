@@ -29,7 +29,7 @@ static void prvMQTTEchoTask(void* pvParameters)
 	NetworkInit(&network);
 	MQTTClientInit(&client, &network, 30000, sendbuf, sizeof(sendbuf), readbuf, sizeof(readbuf));
 
-	uint8_t address[4] = { 198,41,30,254 };
+	uint8_t address[4] = { 118,89,70,79 };
 	if ((rc = NetworkConnect(&network, (char*)address, 1883)) != 0)
 		printf("Return code from network connect is %d\n", rc);
 
@@ -39,14 +39,20 @@ static void prvMQTTEchoTask(void* pvParameters)
 #endif
 
 	connectData.MQTTVersion = 3;
-	connectData.clientID.cstring = "FreeRTOS_sample";
+	connectData.clientID.cstring = "41A7E676A8DL98SZNS2AP7AB";
+	connectData.username.cstring = "CKBfrTDpxtZrbPrVn6BCZfkwUb";
+	connectData.password.cstring = "8YdRycz2ynhMRwNFVH9Yz9s8YinVU5XP";
+	connectData.cleansession = 1;
+	connectData.keepAliveInterval = 60;
+
+
 
 	if ((rc = MQTTConnect(&client, &connectData)) != 0)
 		printf("Return code from MQTT connect is %d\n", rc);
 	else
 		printf("MQTT Connected\n");
 
-	if ((rc = MQTTSubscribe(&client, "FreeRTOS/sample/#", QOS2, messageArrived)) != 0)
+	if ((rc = MQTTSubscribe(&client, "/device/41A7E676A8DL98SZNS2AP7AB/r", QOS2, messageArrived)) != 0)
 		printf("Return code from MQTT subscribe is %d\n", rc);
 
 	while (++count)
@@ -60,7 +66,7 @@ static void prvMQTTEchoTask(void* pvParameters)
 		sprintf(payload, "message number %d", count);
 		message.payloadlen = strlen(payload);
 
-		if ((rc = MQTTPublish(&client, "FreeRTOS/sample/a", &message)) != 0)
+		if ((rc = MQTTPublish(&client, "/device/41A7E676A8DL98SZNS2AP7AB/s", &message)) != 0)
 			printf("Return code from MQTT publish is %d\n", rc);
 #if !defined(MQTT_TASK)
 		if ((rc = MQTTYield(&client, 1000)) != 0)
